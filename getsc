@@ -1,0 +1,193 @@
+#!/usr/bin/env python3
+
+import requests
+import optparse
+
+
+# This is a startup function.
+
+class theStart():
+
+    parser = optparse.OptionParser()
+    parser.add_option("-u", "--url", dest="website", type="string", help="your target url")
+    parser.add_option("-w", "--wordlist", dest="wordlist", type="string", help="path to wordlist")
+    parser.add_option("-s", "--scode", dest='statuscode', type="int", help="status code")
+
+    (options, args) = parser.parse_args()
+
+    # If the user didn't use any required argument then print the following.
+
+    if (options.website is None) and (options.wordlist is None) and (options.statuscode is None):
+
+        print()
+        print("Try 'getsc -h \ --help' for more options.")
+        exit(0)
+
+    # If the user did use the required argument then print the following and continue of running the script.
+
+    else:
+
+        website = options.website
+        wordlist = options.wordlist
+        statuscode = options.statuscode
+
+        print()
+
+# This class it can found a link directory of sites from wordlist or automatically generate a numbers.
+
+class getStatusCode:
+
+    def bruteSC(self):
+        start = theStart()
+
+        scList = {100:"Continue", 101:"Switching Protocols", 200:"OK", 201:"Created", 202:"Accepted",
+                  203:"Non-Authoritative Information", 204:"No Content", 205:"Reset Content", 206:"Partial Content",
+                  300:"Multiple Choices", 301:"Moved Permanently", 302:"Found", 303:"See Other", 304:"Not Modified",
+                  305:"Use Proxy", 306:"Unused", 307:"Temporary Redirect", 400:"Bad Request", 401:"Unauthorized",
+                  402:"Payment Required", 403:"Forbidden", 404:"Not Found", 405:"Method Not Allowed",
+                  406:"Not Acceptable", 407:"Proxy Authentication Required", 408:"Request Timeout", 409:"Conflict",
+                  410:"Gone", 411:"Length Required", 412:"Precondition Failed", 413:"Request Entity Too Large",
+                  414:"Request-URI Too Long", 415:"Unsupported Media Type", 416:"Requested Range Not Satisfiable",
+                  417:"Expectation Failed", 500:"Internal Server Error", 501:"Not Implemented", 502:"Bad Gateway",
+                  503:"Service Unavailable", 504:"Gateway Timeout", 505:"HTTP Version Not Supported"}
+
+        # If the user didn't use {-s or --scode} then go with the following.
+
+        if start.statuscode == None:
+
+            # If the user did write {http:// or https://} in the front of website
+            # and write {/} in the end of website do the following
+
+            if start.website.startswith("http://") or start.website.startswith("https://") == True and start.website.endswith("/") == True:
+
+                # If the user use {-w or --wordlist} to set the wordlist to attack the website link directory.
+
+                if start.wordlist != None:
+                    WordList = open(start.wordlist, encoding="ISO-8859-1")
+                    for i in WordList.readlines():
+                        ReadWordlist = i.strip("\n")
+                        AddWl = start.website + ReadWordlist
+                        getsc = requests.get(AddWl).status_code
+                        if getsc == 404:
+                            continue
+                        print(AddWl, "\t\t", getsc, "\t", scList.get(getsc))
+                    WordList.close()
+
+                # If the user didn't use {-w or --wordlist} then the script
+                # will generate a bunch of numbers to attack the website link directory.
+
+                else:
+                    for i in range(10**6):
+                        AddWl = start.website + str(i)
+                        getsc = requests.get(AddWl).status_code
+                        if getsc == 404:
+                            continue
+                        print(AddWl, "\t\t", getsc, "\t", scList.get(getsc))
+
+            # If the user didn't write {http:// or https://} in the front of website
+            # and {/} in the end of website do the following.
+
+            elif start.website.startswith("http://") or start.website.startswith("https://") == False and start.website.endswith("/") == False:
+
+                # If the user use {-w or --wordlist} to set the wordlist to attack the website link directory.
+
+                if start.wordlist != None:
+                    WordList = open(start.wordlist, encoding="ISO-8859-1")
+                    for i in WordList.readlines():
+                        ReadWordlist = i.strip("\n")
+                        AddWl = "http://" + start.website + "/" + ReadWordlist
+                        getsc = requests.get(AddWl).status_code
+                        if getsc == 404:
+                            continue
+                        print(AddWl, "\t\t", getsc, "\t", scList.get(getsc))
+                    WordList.close()
+
+                # If the user didn't use {-w or --wordlist} then the script
+                # will generate a bunch of numbers to attack the website link directory.
+
+                else:
+                    for i in range(10**6):
+                        AddWl = "http://" + start.website + "/" + str(i)
+                        getsc = requests.get(AddWl).status_code
+                        if getsc == 404:
+                            continue
+                        print(AddWl, "\t\t", getsc, "\t", scList.get(getsc))
+
+        # If the user did use {-s or --scode} then go with the following.
+
+        elif start.statuscode != None:
+
+            # If the user did write {http:// or https://} in the front of website
+            # and write {/} in the end of website do the following
+
+            if start.website.startswith("http://") or start.website.startswith("https://") == True and start.website.endswith("/") == True:
+
+                # If the user use {-w or --wordlist} to set the wordlist to attack the website link directory.
+
+                if start.wordlist != None:
+                    WordList = open(start.wordlist, encoding="ISO-8859-1")
+                    for i in WordList.readlines():
+                        ReadWordlist = i.strip("\n")
+                        AddWl = start.website + ReadWordlist
+                        getsc = requests.get(AddWl).status_code
+                        if getsc != start.statuscode:
+                            continue
+                        print(AddWl, "\t\t", getsc, "\t", scList.get(getsc))
+                    WordList.close()
+
+                # If the user didn't use {-w or --wordlist} then the script
+                # will generate a bunch of numbers to attack the website link directory.
+
+                else:
+                    for i in range(10**6):
+                        AddWl = start.website + str(i)
+                        getsc = requests.get(AddWl).status_code
+                        if getsc != start.statuscode:
+                            continue
+                        print(AddWl, "\t\t", getsc, "\t", scList.get(getsc))
+
+            # If the user didn't write {http:// or https://} in the front of website
+            # and {/} in the end of website do the following.
+
+            elif start.website.startswith("http://") or start.website.startswith("https://") == False and start.website.endswith("/") == False:
+
+                # If the user use {-w or --wordlist} to set the wordlist to attack the website link directory.
+
+                if start.wordlist != None:
+                    WordList = open(start.wordlist, encoding="ISO-8859-1")
+                    for i in WordList.readlines():
+                        ReadWordlist = i.strip("\n")
+                        AddWl = "http://" + start.website + "/" + ReadWordlist
+                        getsc = requests.get(AddWl).status_code
+                        if getsc != start.statuscode:
+                            continue
+                        print(AddWl, "\t\t", getsc, "\t", scList.get(getsc))
+                    WordList.close()
+
+                # If the user didn't use {-w or --wordlist} then the script
+                # will generate a bunch of numbers to attack the website link directory.
+
+                else:
+                    for i in range(10**6):
+                        AddWl = "http://" + start.website + "/" + str(i)
+                        getsc = requests.get(AddWl).status_code
+                        if getsc != start.statuscode:
+                            continue
+                        print(AddWl, "\t\t", getsc, "\t", scList.get(getsc))
+
+# This is the main function the script run from it.
+
+def main():
+
+    try: # Run the script from here if there's no error.
+
+        getStatusCode().bruteSC()
+        print("-" * 60)
+
+    except: # If there's an error in the script pass it and exit.
+        pass
+
+# From here the main function run.
+
+if __name__ == "__main__":
+    main()
